@@ -4,6 +4,7 @@
 
 require "logstash/filters/base"
 require "logstash/namespace"
+require "logstash/timestamp"
 
 require "csv"
 require "bigdecimal"
@@ -160,7 +161,6 @@ class LogStash::Filters::Bro < LogStash::Filters::Base
           	dest["#{field_name}_secs"] = secs.to_f
           	msec  = secs * 1000 # convert to whole number of milliseconds
           	msec  = msec.to_i
-          	dest["#{field_name}_usec"] = (secs * 10**6) % 1000
           	values[i] = Time.at(msec / 1000, (msec % 1000) * 1000)
           end
 
@@ -168,8 +168,9 @@ class LogStash::Filters::Bro < LogStash::Filters::Base
         end
 
         # Add some additional data
-        dest["@timestamp"]  = dest["ts"]
-        dest["ts_end"]      = dest["ts"] + dest["duration"] if not dest["duration"].nil?
+        dest["@timestamp"]  = LogStash::Timestamp.new(dest["ts"])
+        dest["ts_end"]      = LogStash::Timestamp.new(dest["ts"] + dest["duration"]) if not dest["duration"].nil?
+        dest["ts"]          = LogStash::Timestamp.new(dest["ts"])
         dest["bro_logtype"] = @meta[path_]["path"]
 
         filter_matched(event)
@@ -186,3 +187,4 @@ class LogStash::Filters::Bro < LogStash::Filters::Base
   end # def filter
 
 end # class LogStash::Filters::Bro# encoding: utf-8
+
