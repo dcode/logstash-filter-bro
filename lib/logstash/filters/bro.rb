@@ -161,7 +161,7 @@ class LogStash::Filters::Bro < LogStash::Filters::Base
           	dest["#{field_name}_secs"] = secs.to_f
           	msec  = secs * 1000 # convert to whole number of milliseconds
           	msec  = msec.to_i
-          	values[i] = Time.at(msec / 1000, (msec % 1000) * 1000)
+          	values[i] = Time.at(msec / 1000, (msec % 1000) * 1000).utc
           end
 
           dest[field_name] = values[i]
