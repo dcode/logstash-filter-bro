@@ -7,7 +7,19 @@ It is fully free and fully open source. The license is Apache 2.0, meaning you a
 ## Install
 
 You can install/upgrade the binary version of this plugin by following these instructions.
-<script src="https://gist.github.com/dcode/795f26022a70f64091aa.js"></script>
+
+~~~~~~~~~~
+
+# Download gem
+cd /tmp
+curl -L 'https://app.box.com/shared/static/5wf3k4daxmny6o9kfzacihsyrs2tzv0s.gem' -o logstash-filter-bro-0.9.5.gem
+
+# Install plugin
+/opt/logstash/bin/plugin install ./logstash-filter-bro-0.9.5.gem
+
+# Restart logstash
+service logstash restart
+~~~~~~~~~~
 
 ## Documentation
 
