@@ -21,6 +21,43 @@ curl -L 'https://app.box.com/shared/static/5wf3k4daxmny6o9kfzacihsyrs2tzv0s.gem'
 service logstash restart
 ~~~~~~~~~~
 
+### Example config
+
+This is how I setup this filter. I of course change the output to my preferred location (which is not usually stdout)
+~~~~~~~~~~
+# /etc/logstash/config.d/bro-logs.conf
+input {
+  file {
+    path => "/opt/bro/logs/current/*.log"
+    exclude => [
+                "/opt/bro/logs/current/stderr.log",
+                "/opt/bro/logs/current/stdout.log",
+                "/opt/bro/logs/current/communication.log",
+                "/opt/bro/logs/current/loaded_scripts.log"
+                ]
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+    add_field => { "[@metadata][stage]" => "bro_raw" }
+  }
+}
+
+filter {
+  if [@metadata][stage] == "bro_raw" {
+    bro { }
+
+    if [path] =~ /^\/.*\.log/ {
+      mutate { remove_field => ["path"] }
+    }
+  }
+}
+
+output {
+  if [@metadata][stage] == "bro_raw" {
+    stdout { codec => rubydebug }
+  }
+}
+~~~~~~~~~~
+
 ## Documentation
 
 Logstash provides infrastructure to automatically generate documentation for this plugin. We use the asciidoc format to write documentation so any comments in the source code will be first converted into asciidoc and then into html. All plugin documentation are placed under one [central location](http://www.elastic.co/guide/en/logstash/current/).
